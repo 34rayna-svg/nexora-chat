@@ -199,11 +199,17 @@ document.getElementById("authForm").onsubmit = async (e) => {
       }
 
     } else {
-      result = await db.auth.signInWithPassword({
-        email,
-        password
-      });
-
+      result = await db.auth.signUp({
+  email,
+  password,
+  options: {
+    data: {
+      display_name: displayName
+    },
+    emailRedirectTo:
+      "https://34rayna-svg.github.io/nexora-chat/"
+  }
+});
       if (result.error) throw result.error;
       showDashboard(result.data.user);
     }
