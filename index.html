@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#09152B">
+<title>NEXORA - Connect Beyond Limits</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Arial,sans-serif;
+  background:#09152B;color:white;
+  min-height:100vh;display:flex;
+  align-items:center;justify-content:center;
+  padding:20px;
+}
+.container{
+  width:100%;max-width:420px;
+  background:#11223D;border:1px solid #233C60;
+  border-radius:24px;padding:30px;
+  box-shadow:0 20px 70px #0006;
+}
+.logo{text-align:center;margin-bottom:30px}
+.logo-icon{
+  width:70px;height:70px;margin:auto auto 15px;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,#168BFF,#635BFF);
+  border-radius:22px;font-size:32px;font-weight:bold;
+}
+.logo h1{font-size:30px;letter-spacing:3px}
+.logo p{color:#8BA7CC;margin-top:8px;font-size:13px}
+h2{font-size:21px;margin-bottom:8px}
+.subtitle{color:#91A6C5;font-size:13px;margin-bottom:25px}
+input{
+  width:100%;padding:15px;margin-bottom:14px;
+  border-radius:12px;border:1px solid #294362;
+  background:#0B1A30;color:white;font-size:15px;
+  outline:none;
+}
+input:focus{border-color:#258AFF}
+button{
+  width:100%;padding:15px;border:0;border-radius:12px;
+  background:linear-gradient(100deg,#168BFF,#625CFF);
+  color:white;font-size:15px;font-weight:bold;
+  cursor:pointer;margin-top:5px;
+}
+button:disabled{opacity:.6}
+.switch{text-align:center;margin-top:22px;color:#9DB1CE;font-size:13px}
+.switch span{color:#43A1FF;cursor:pointer;font-weight:bold}
+.message{font-size:13px;margin-top:16px;text-align:center;line-height:1.6}
+.success{color:#48D9A0}
+.error{color:#FF8181}
+.hidden{display:none}
+#dashboard{text-align:center}
+#dashboard p{color:#A7BCD9;margin:15px 0}
+.logout{background:#253C5B}
+.footer{text-align:center;color:#657E9F;font-size:11px;margin-top:25px}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="logo">
+    <div class="logo-icon">N</div>
+    <h1>NEXORA</h1>
+    <p>CONNECT BEYOND LIMITS</p>
+  </div>
+
+  <section id="auth">
+    <h2 id="formTitle">Welcome Back</h2>
+    <p class="subtitle" id="formSubtitle">Sign in to continue to NEXORA</p>
+
+    <form id="authForm">
+      <input id="displayName" type="text"
+        placeholder="Your name" class="hidden">
+
+      <input id="email" type="email"
+        placeholder="Email address" required>
+
+      <input id="password" type="password"
+        placeholder="Password (minimum 8 characters)"
+        minlength="8" required>
+
+      <button id="submitBtn" type="submit">Sign In</button>
+    </form>
+
+    <div class="switch">
+      <span id="switchText">Don't have an account? </span>
+      <span id="switchBtn">Create Account</span>
+    </div>
+
+    <div id="message" class="message"></div>
+  </section>
+
+  <section id="dashboard" class="hidden">
+    <h2>Welcome to NEXORA</h2>
+    <p id="userEmail"></p>
+    <p>Your account is connected successfully.</p>
+    <button class="logout" id="logoutBtn">Sign Out</button>
+  </section>
+
+  <div class="footer">NEXORA © 2026 · Secure Connection</div>
+</div>
+
+<script>
+const SUPABASE_URL =
+  "https://bhxqovclabgfxifaxwrf.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_KELy2zTCIz73Os1eQDa8eQ_QWcCFNRJ";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let isSignup = false;
+
+const auth = document.getElementById("auth");
+const dashboard = document.getElementById("dashboard");
+const message = document.getElementById("message");
+const submitBtn = document.getElementById("submitBtn");
+
+function showMessage(text, type) {
+  message.textContent = text;
+  message.className = "message " + type;
+}
+
+function switchMode() {
+  isSignup = !isSignup;
+
+  document.getElementById("formTitle").textContent =
+    isSignup ? "Create Account" : "Welcome Back";
+
+  document.getElementById("formSubtitle").textContent =
+    isSignup ? "Join the NEXORA community" :
+    "Sign in to continue to NEXORA";
+
+  document.getElementById("displayName").classList.toggle(
+    "hidden", !isSignup
+  );
+
+  submitBtn.textContent = isSignup ? "Create Account" : "Sign In";
+
+  document.getElementById("switchText").textContent =
+    isSignup ? "Already have an account? " :
+    "Don't have an account? ";
+
+  document.getElementById("switchBtn").textContent =
+    isSignup ? "Sign In" : "Create Account";
+
+  showMessage("", "");
+}
+
+document.getElementById("switchBtn").onclick = switchMode;
+
+document.getElementById("authForm").onsubmit = async (e) => {
+  e.preventDefault();
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Please wait...";
+  showMessage("", "");
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const displayName =
+    document.getElementById("displayName").value.trim();
+
+  try {
+    let result;
+
+    if (isSignup) {
+      if (!displayName) {
+        throw new Error("Please enter your name.");
+      }
+
+      result = await db.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { display_name: displayName }
+        }
+      });
+
+      if (result.error) throw result.error;
+
+      if (!result.data.session) {
+        showMessage(
+          "Account created. Please check your email to confirm your account.",
+          "success"
+        );
+      } else {
+        showDashboard(result.data.user);
+      }
+
+    } else {
+      result = await db.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (result.error) throw result.error;
+      showDashboard(result.data.user);
+    }
+
+  } catch (error) {
+    showMessage(error.message || "Something went wrong.", "error");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent =
+      isSignup ? "Create Account" : "Sign In";
+  }
+};
+
+function showDashboard(user) {
+  auth.classList.add("hidden");
+  dashboard.classList.remove("hidden");
+  document.getElementById("userEmail").textContent =
+    user.email || "";
+}
+
+document.getElementById("logoutBtn").onclick = async () => {
+  const { error } = await db.auth.signOut();
+
+  if (error) {
+    showMessage(error.message, "error");
+    return;
+  }
+
+  dashboard.classList.add("hidden");
+  auth.classList.remove("hidden");
+  document.getElementById("authForm").reset();
+};
+
+async function initialize() {
+  const { data, error } = await db.auth.getSession();
+
+  if (error) {
+    showMessage(error.message, "error");
+    return;
+  }
+
+  if (data.session) {
+    showDashboard(data.session.user);
+  }
+}
+
+initialize();
+</script>
+</body>
+</html>
