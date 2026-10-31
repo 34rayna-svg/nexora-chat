@@ -9,7 +9,7 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#080e20;color:#f5f7ff;font-family:Arial,sans-serif}
-button,input{font:inherit}
+button,input,textarea{font:inherit}
 button{cursor:pointer}
 .hidden{display:none!important}
 #auth{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(ellipse at top,#1b376b,#080e20 65%)}
@@ -17,10 +17,10 @@ button{cursor:pointer}
 .logo{width:65px;height:65px;border-radius:21px;background:linear-gradient(140deg,#38a5ff,#2452e9);display:grid;place-items:center;font-size:32px;font-weight:bold;margin:0 auto 15px}
 .brand{text-align:center;font-size:30px;letter-spacing:4px;margin:0}
 .tag{text-align:center;color:#91a9d2;font-size:12px;margin:8px 0 28px}
-h2{font-size:21px}
+h2{font-size:21px;margin:0}
 label{display:block;color:#b9c9e4;font-size:13px;margin:16px 0 8px}
-input{width:100%;padding:14px;border-radius:11px;border:1px solid #304466;background:#091329;color:white;outline:none}
-input:focus{border-color:#3898ff}
+input,textarea{width:100%;padding:14px;border-radius:11px;border:1px solid #304466;background:#091329;color:white;outline:none}
+input:focus,textarea:focus{border-color:#3898ff}
 .primary{border:0;border-radius:12px;padding:14px;background:linear-gradient(100deg,#238dff,#3159ef);color:white;font-weight:bold;width:100%;margin-top:20px}
 .primary:disabled{opacity:.6}
 .switch{text-align:center;color:#91a9d2;font-size:13px;margin-top:20px}
@@ -40,7 +40,7 @@ input:focus{border-color:#3898ff}
 .circle{width:53px;height:53px;border-radius:50%;padding:3px;margin:0 auto 7px;background:linear-gradient(135deg,#35b6ff,#7556ff)}
 .circle span{height:100%;width:100%;display:grid;place-items:center;border-radius:50%;background:#142440;font-size:19px}
 .sectionhead{display:flex;align-items:center;justify-content:space-between;padding:20px 19px 10px}
-.sectionhead h2{font-size:17px;margin:0}
+.sectionhead h2{font-size:17px}
 .muted{color:#8298bc;font-size:12px}
 #chatList{padding:0 13px}
 .chatrow{display:flex;align-items:center;gap:13px;padding:14px 8px;border-bottom:1px solid #ffffff0d;cursor:pointer}
@@ -59,7 +59,6 @@ input:focus{border-color:#3898ff}
 .close{background:none;border:0;color:white;font-size:24px}
 .userresult{display:flex;align-items:center;gap:12px;padding:13px 5px;border-bottom:1px solid #ffffff12;cursor:pointer}
 #status{font-size:12px;color:#8fa7ca;padding:12px 19px}
-
 #conversation{position:fixed;inset:0;z-index:20;background:#080e20;display:flex;flex-direction:column;max-width:650px;margin:auto;width:100%;height:100dvh}
 .convhead{display:flex;align-items:center;gap:12px;padding:14px;background:#142746;border-bottom:1px solid #ffffff20}
 .convbody{flex:1;overflow:auto;padding:15px;display:flex;flex-direction:column;gap:9px}
@@ -67,9 +66,10 @@ input:focus{border-color:#3898ff}
 .msg.mine{align-self:flex-end;background:#176fca}
 .msg small{display:block;font-size:10px;opacity:.7;margin-top:5px}
 .convform{display:flex;gap:8px;padding:12px;background:#101d35}
-.convform textarea{flex:1;min-width:0;resize:none;border-radius:12px;border:1px solid #304466;background:#091329;color:white;padding:12px;font:inherit}
+.convform textarea{flex:1;min-width:0;resize:none;border-radius:12px}
 .profilemodal{position:fixed;inset:0;background:#000a;z-index:30;display:grid;place-items:center;padding:18px}
 .profilecard{width:100%;max-width:420px;background:#14213b;border:1px solid #ffffff22;border-radius:20px;padding:20px}
+.danger{background:#3a1d28;border:1px solid #6b2d40;color:#ffb3c1;border-radius:12px;padding:12px;width:100%;margin-top:12px}
 </style>
 </head>
 <body>
@@ -79,23 +79,21 @@ input:focus{border-color:#3898ff}
   <div class="logo">N</div>
   <h1 class="brand">NEXORA</h1>
   <p class="tag">CONNECT BEYOND LIMITS</p>
-  <div id="authArea">
-   <h2 id="authTitle">مرحباً بعودتك</h2>
-   <p class="muted" id="authDesc">سجّل الدخول وتواصل مع العالم.</p>
-   <form id="authForm">
-    <label for="email">البريد الإلكتروني</label>
-    <input id="email" type="email" required placeholder="example@email.com" autocomplete="email">
-    <label for="password">كلمة المرور</label>
-    <input id="password" type="password" required minlength="6" placeholder="••••••••" autocomplete="current-password">
-    <div id="nameArea" class="hidden">
-     <label for="displayName">الاسم الظاهر</label>
-     <input id="displayName" placeholder="اسمك" autocomplete="name">
-    </div>
-    <button class="primary" id="submitBtn" type="submit">تسجيل الدخول</button>
-   </form>
-   <p class="switch"><span id="toggle" role="button" tabindex="0">إنشاء حساب جديد</span></p>
-   <div id="message" aria-live="polite"></div>
-  </div>
+  <h2 id="authTitle">مرحباً بعودتك</h2>
+  <p class="muted" id="authDesc">سجّل الدخول وتواصل مع العالم.</p>
+  <form id="authForm">
+   <label for="email">البريد الإلكتروني</label>
+   <input id="email" type="email" required placeholder="example@email.com" autocomplete="email">
+   <label for="password">كلمة المرور</label>
+   <input id="password" type="password" required minlength="6" placeholder="••••••••" autocomplete="current-password">
+   <div id="nameArea" class="hidden">
+    <label for="displayName">الاسم الظاهر</label>
+    <input id="displayName" placeholder="اسمك" autocomplete="name">
+   </div>
+   <button class="primary" id="submitBtn" type="submit">تسجيل الدخول</button>
+  </form>
+  <p class="switch"><span id="toggle" role="button" tabindex="0">إنشاء حساب جديد</span></p>
+  <div id="message" aria-live="polite"></div>
  </div>
 </section>
 
@@ -134,13 +132,38 @@ input:focus{border-color:#3898ff}
  </nav>
 </main>
 
-
 <section id="conversation" class="hidden">
- <header class="convhead"><button class="newbtn" id="convBack">رجوع</button><div class="avatar">N</div><div style="flex:1"><b id="convTitle">المحادثة</b><div class="muted" id="convState">تحميل...</div></div></header>
+ <header class="convhead">
+  <button class="newbtn" id="convBack">رجوع</button>
+  <div class="avatar" id="convAvatar">N</div>
+  <div style="flex:1;min-width:0">
+   <b id="convTitle">المحادثة</b>
+   <div class="muted" id="convState">تحميل...</div>
+  </div>
+ </header>
  <div id="messages" class="convbody"><div class="empty">جارٍ تحميل الرسائل...</div></div>
- <form id="sendForm" class="convform"><textarea id="messageText" rows="1" maxlength="5000" placeholder="اكتب رسالتك..."></textarea><button class="newbtn" type="submit">إرسال</button></form>
+ <form id="sendForm" class="convform">
+  <textarea id="messageText" rows="1" maxlength="5000" placeholder="اكتب رسالتك..."></textarea>
+  <button class="newbtn" id="sendBtn" type="submit">إرسال</button>
+ </form>
 </section>
-<section id="profileModal" class="profilemodal hidden"><div class="profilecard"><div class="modalhead"><h2>ملفي الشخصي</h2><button class="close" id="profileClose">×</button></div><label>الاسم الظاهر</label><input id="profileDisplay"><label>اسم المستخدم</label><input id="profileUsername"><button class="primary" id="profileSave">حفظ التغييرات</button><div id="profileMessage" class="muted"></div></div></section>
+
+<section id="profileModal" class="profilemodal hidden">
+ <div class="profilecard">
+  <div class="modalhead">
+   <h2>ملفي الشخصي</h2>
+   <button class="close" id="profileClose">×</button>
+  </div>
+  <label for="profileDisplay">الاسم الظاهر</label>
+  <input id="profileDisplay">
+  <label for="profileUsername">اسم المستخدم</label>
+  <input id="profileUsername">
+  <button class="primary" id="profileSave">حفظ التغييرات</button>
+  <button class="danger" id="logoutBtn">تسجيل الخروج</button>
+  <div id="profileMessage" class="muted" style="margin-top:12px"></div>
+ </div>
+</section>
+
 <div id="newPanel" class="hidden">
  <div class="modal">
   <div class="modalhead">
@@ -149,7 +172,7 @@ input:focus{border-color:#3898ff}
   </div>
   <p class="muted">ابحث عن مستخدم بالاسم أو اسم المستخدم.</p>
   <input id="userSearch" placeholder="اكتب اسم المستخدم...">
-  <div id="userResults"></div>
+  <div id="userResults" style="margin-top:12px"></div>
  </div>
 </div>
 
@@ -159,6 +182,7 @@ input:focus{border-color:#3898ff}
 
 const SUPABASE_URL="https://bhxqovclabgfxifaxwrf.supabase.co";
 const SUPABASE_KEY="sb_publishable_KELy2zTCIz73Os1eQDa8eQ_QWcCFNRJ";
+
 const $=id=>document.getElementById(id);
 
 let db=null;
@@ -166,10 +190,14 @@ let signup=false;
 let currentUser=null;
 let allChats=[];
 let searchTimer=null;
+let activeConversation=null;
+let messageChannel=null;
+let knownMessages=new Set();
 
-function showMessage(message,success=false){
- $("message").textContent=message;
- $("message").style.color=success?"#70e5b0":"#ffaaaa";
+function showMessage(text,success=false){
+ const el=$("message");
+ el.textContent=text;
+ el.style.color=success?"#70e5b0":"#ffaaaa";
 }
 
 function setMode(){
@@ -179,7 +207,7 @@ function setMode(){
  $("submitBtn").textContent=signup?"إنشاء الحساب":"تسجيل الدخول";
  $("toggle").textContent=signup?"لديك حساب؟ تسجيل الدخول":"إنشاء حساب جديد";
  $("nameArea").classList.toggle("hidden",!signup);
- $("password").autocomplete=signup?"new-password":"current-password";
+ $("password").setAttribute("autocomplete",signup?"new-password":"current-password");
  showMessage("");
 }
 
@@ -191,6 +219,7 @@ $("toggle").addEventListener("keydown",e=>{
 async function enterApp(user){
  currentUser=user;
  $("auth").classList.add("hidden");
+ $("conversation").classList.add("hidden");
  $("app").classList.remove("hidden");
  await loadChats();
 }
@@ -199,7 +228,6 @@ $("authForm").addEventListener("submit",async e=>{
  e.preventDefault();
  const button=$("submitBtn");
  button.disabled=true;
- button.textContent="يرجى الانتظار...";
  showMessage("جارٍ الاتصال...");
 
  try{
@@ -214,11 +242,10 @@ $("authForm").addEventListener("submit",async e=>{
    if(!displayName)throw new Error("أدخل الاسم الظاهر أولاً.");
 
    result=await db.auth.signUp({
-    email:email,
-    password:password,
+    email,
+    password,
     options:{data:{display_name:displayName}}
    });
-
    if(result.error)throw result.error;
 
    if(!result.data.session){
@@ -226,30 +253,24 @@ $("authForm").addEventListener("submit",async e=>{
     return;
    }
   }else{
-   result=await db.auth.signInWithPassword({
-    email:email,
-    password:password
-   });
+   result=await db.auth.signInWithPassword({email,password});
    if(result.error)throw result.error;
   }
 
   if(result.data.session){
    showMessage("تم تسجيل الدخول بنجاح.",true);
    await enterApp(result.data.session.user);
-  }else{
-   showMessage("لم يتم إنشاء جلسة دخول. تحقق من بريدك الإلكتروني.");
   }
-
  }catch(err){
   showMessage(err.message||"حدث خطأ غير معروف.");
  }finally{
   button.disabled=false;
-  button.textContent=signup?"إنشاء الحساب":"تسجيل الدخول";
  }
 });
 
 async function loadChats(){
  $("status").textContent="جارٍ تحميل المحادثات...";
+
  const {data,error}=await db.from("conversation_members")
   .select("conversation_id,conversations(id,is_group,title,created_at)")
   .eq("user_id",currentUser.id);
@@ -259,16 +280,52 @@ async function loadChats(){
   return;
  }
 
- allChats=(data||[]).map(item=>item.conversations).filter(Boolean);
- renderChats(allChats);
+ const convs=(data||[]).map(r=>r.conversations).filter(Boolean);
+ const names={};
+
+ if(convs.length){
+  const ids=convs.map(c=>c.id);
+  const {data:others}=await db.from("conversation_members")
+   .select("conversation_id,user_id")
+   .in("conversation_id",ids)
+   .neq("user_id",currentUser.id);
+
+  const otherIds=[...new Set((others||[]).map(m=>m.user_id))];
+  let profiles=[];
+  if(otherIds.length){
+   const {data:p}=await db.from("profiles").select("id,display_name,username").in("id",otherIds);
+   profiles=p||[];
+  }
+  const byId={};
+  profiles.forEach(p=>byId[p.id]=p);
+  (others||[]).forEach(m=>{
+   if(!names[m.conversation_id]){
+    const p=byId[m.user_id];
+    names[m.conversation_id]=p?(p.display_name||p.username):null;
+   }
+  });
+ }
+
+ allChats=convs.map(c=>({
+  ...c,
+  displayTitle:c.is_group?(c.title||"مجموعة"):(names[c.id]||"محادثة خاصة")
+ }));
+
+ applyFilter();
+}
+
+function applyFilter(){
+ const q=$("filter").value.trim().toLowerCase();
+ renderChats(allChats.filter(c=>c.displayTitle.toLowerCase().includes(q)));
 }
 
 function renderChats(chats){
- $("chatList").innerHTML="";
- $("status").textContent=chats.length?chats.length+" محادثة":"لا توجد محادثات حتى الآن";
+ const list=$("chatList");
+ list.innerHTML="";
+ $("status").textContent=allChats.length?allChats.length+" محادثة":"لا توجد محادثات حتى الآن";
 
  if(!chats.length){
-  $("chatList").innerHTML='<div class="empty">ليس لديك محادثات بعد.<br>ابدأ محادثة جديدة مع أحد مستخدمي NEXORA.</div>';
+  list.innerHTML='<div class="empty">ليس لديك محادثات بعد.<br>ابدأ محادثة جديدة مع أحد مستخدمي NEXORA.</div>';
   return;
  }
 
@@ -278,14 +335,14 @@ function renderChats(chats){
 
   const avatar=document.createElement("div");
   avatar.className="avatar";
-  avatar.textContent=chat.is_group?"👥":"N";
+  avatar.textContent=chat.is_group?"👥":(chat.displayTitle.trim().charAt(0)||"N");
 
   const info=document.createElement("div");
   info.className="chatinfo";
 
   const name=document.createElement("div");
   name.className="chatname";
-  name.textContent=chat.title||"محادثة خاصة";
+  name.textContent=chat.displayTitle;
 
   const preview=document.createElement("div");
   preview.className="preview";
@@ -293,19 +350,12 @@ function renderChats(chats){
 
   info.append(name,preview);
   row.append(avatar,info);
-
-  row.addEventListener("click",()=>openConversation(chat.id,chat.title||"محادثة خاصة"));
-
-  $("chatList").append(row);
+  row.addEventListener("click",()=>openConversation(chat.id,chat.displayTitle));
+  list.append(row);
  });
 }
 
-$("filter").addEventListener("input",()=>{
- const q=$("filter").value.trim().toLowerCase();
- renderChats(allChats.filter(chat=>
-  (chat.title||"محادثة خاصة").toLowerCase().includes(q)
- ));
-});
+$("filter").addEventListener("input",applyFilter);
 
 $("newChat").addEventListener("click",()=>{
  $("newPanel").classList.remove("hidden");
@@ -313,9 +363,7 @@ $("newChat").addEventListener("click",()=>{
  $("userResults").textContent="";
 });
 
-$("closePanel").addEventListener("click",()=>{
- $("newPanel").classList.add("hidden");
-});
+$("closePanel").addEventListener("click",()=>$("newPanel").classList.add("hidden"));
 
 $("userSearch").addEventListener("input",()=>{
  clearTimeout(searchTimer);
@@ -324,29 +372,31 @@ $("userSearch").addEventListener("input",()=>{
 
 async function searchUsers(){
  const query=$("userSearch").value.trim();
+ const results=$("userResults");
+
  if(query.length<2){
-  $("userResults").textContent="اكتب حرفين على الأقل للبحث.";
+  results.textContent="اكتب حرفين على الأقل للبحث.";
   return;
  }
 
- $("userResults").textContent="جارٍ البحث...";
+ results.textContent="جارٍ البحث...";
+ const safe=query.replace(/[*,()"]/g,"");
 
- const safeQuery=query.replace(/[%_]/g,"");
  const {data,error}=await db.from("profiles")
   .select("id,username,display_name")
   .neq("id",currentUser.id)
-  .or("username.ilike.%"+safeQuery+"%,display_name.ilike.%"+safeQuery+"%")
+  .or(`username.ilike.*${safe}*,display_name.ilike.*${safe}*`)
   .limit(15);
 
  if(error){
-  $("userResults").textContent="تعذر البحث: "+error.message;
+  results.textContent="تعذر البحث: "+error.message;
   return;
  }
 
- $("userResults").innerHTML="";
+ results.innerHTML="";
 
  if(!data||!data.length){
-  $("userResults").textContent="لم يتم العثور على مستخدمين.";
+  results.textContent="لم يتم العثور على مستخدمين.";
   return;
  }
 
@@ -356,7 +406,7 @@ async function searchUsers(){
 
   const avatar=document.createElement("div");
   avatar.className="avatar";
-  avatar.textContent=(user.display_name||user.username||"N").slice(0,1);
+  avatar.textContent=(user.display_name||user.username||"N").charAt(0);
 
   const info=document.createElement("div");
   const name=document.createElement("div");
@@ -370,16 +420,14 @@ async function searchUsers(){
   info.append(name,handle);
   row.append(avatar,info);
   row.addEventListener("click",()=>startChat(user));
-  $("userResults").append(row);
+  results.append(row);
  });
 }
 
 async function startChat(user){
  $("userResults").textContent="جارٍ إنشاء المحادثة...";
 
- const {data,error}=await db.rpc("create_direct_conversation",{
-  p_other_user_id:user.id
- });
+ const {data:convId,error}=await db.rpc("create_direct_conversation",{p_other_user_id:user.id});
 
  if(error){
   $("userResults").textContent="تعذر إنشاء المحادثة: "+error.message;
@@ -388,101 +436,180 @@ async function startChat(user){
 
  $("newPanel").classList.add("hidden");
  await loadChats();
- alert("تم إنشاء المحادثة أو فتح محادثتك السابقة.");
+ openConversation(convId,user.display_name||user.username||"مستخدم NEXORA");
 }
 
-$("profileBtn").addEventListener("click",async()=>{
+function openProfile(){
+ db.from("profiles").select("id,username,display_name").eq("id",currentUser.id).single()
+  .then(({data,error})=>{
+   if(error){alert(error.message);return;}
+   $("profileDisplay").value=data.display_name||"";
+   $("profileUsername").value=data.username||"";
+   $("profileMessage").textContent="";
+   $("profileModal").classList.remove("hidden");
+  });
+}
+
+$("profileBtn").addEventListener("click",openProfile);
+$("profileClose").addEventListener("click",()=>$("profileModal").classList.add("hidden"));
+
+$("profileSave").addEventListener("click",async()=>{
+ const display_name=$("profileDisplay").value.trim();
+ const username=$("profileUsername").value.trim();
+ if(!display_name||!username){
+  $("profileMessage").textContent="أدخل الاسم واسم المستخدم.";
+  return;
+ }
+ const {error}=await db.from("profiles").update({display_name,username}).eq("id",currentUser.id);
+ $("profileMessage").textContent=error?error.message:"تم حفظ الملف الشخصي.";
+});
+
+$("logoutBtn").addEventListener("click",async()=>{
  if(!confirm("هل تريد تسجيل الخروج؟"))return;
  const {error}=await db.auth.signOut();
  if(error){alert(error.message);return;}
+ location.reload();
 });
 
-$("storiesBtn").addEventListener("click",()=>{
- alert("قسم الحالات قيد التطوير.");
-});
-$("callsBtn").addEventListener("click",()=>{
- alert("المكالمات تحتاج إعداد خدمة اتصال مستقلة.");
-});
-$("settingsBtn").addEventListener("click",()=>{
- alert("إعدادات الحساب قيد التطوير.");
-});
+$("storiesBtn").addEventListener("click",()=>alert("قسم الحالات قيد التطوير."));
+$("callsBtn").addEventListener("click",()=>alert("المكالمات تحتاج إعداد خدمة اتصال مستقلة."));
+$("settingsBtn").addEventListener("click",()=>alert("إعدادات الحساب قيد التطوير."));
 
-
-let activeConversation=null, messageChannel=null, knownMessages=new Set(), activeProfile=null;
-function safeText(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function renderMessage(m){
- if(knownMessages.has(m.id))return;knownMessages.add(m.id);
- const box=$("messages");if(box.querySelector(".empty"))box.innerHTML="";
- const el=document.createElement("div");el.className="msg"+(m.sender_id===currentUser.id?" mine":"");
+ if(knownMessages.has(m.id))return;
+ knownMessages.add(m.id);
+
+ const box=$("messages");
+ if(box.querySelector(".empty"))box.innerHTML="";
+
+ const el=document.createElement("div");
+ el.className="msg"+(m.sender_id===currentUser.id?" mine":"");
  el.textContent=m.content||"";
- const stamp=document.createElement("small");stamp.textContent=new Date(m.created_at).toLocaleString("ar-DZ",{hour:"2-digit",minute:"2-digit"});
- el.appendChild(stamp);box.appendChild(el);box.scrollTop=box.scrollHeight;
+
+ const stamp=document.createElement("small");
+ stamp.textContent=new Date(m.created_at).toLocaleTimeString("ar",{hour:"2-digit",minute:"2-digit"});
+ el.appendChild(stamp);
+
+ box.appendChild(el);
+ box.scrollTop=box.scrollHeight;
 }
+
+function showEmpty(text){
+ const box=$("messages");
+ box.innerHTML="";
+ const div=document.createElement("div");
+ div.className="empty";
+ div.textContent=text;
+ box.appendChild(div);
+}
+
 async function openConversation(id,title){
- activeConversation=id;knownMessages.clear();
- $("convTitle").textContent=title;$("messages").innerHTML='<div class="empty">جارٍ تحميل الرسائل...</div>';
- $("app").classList.add("hidden");$("conversation").classList.remove("hidden");
- const {data,error}=await db.from("messages").select("id,sender_id,content,created_at,deleted_at").eq("conversation_id",id).is("deleted_at",null).order("created_at",{ascending:true}).limit(300);
- if(error){$("messages").innerHTML='<div class="empty">'+safeText(error.message)+'</div>';return;}
- $("messages").innerHTML="";(data||[]).forEach(renderMessage);
- if(!data?.length)$("messages").innerHTML='<div class="empty">لا توجد رسائل بعد. اكتب أول رسالة.</div>';
- if(messageChannel)await db.removeChannel(messageChannel);
- messageChannel=db.channel("nexora-"+id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"conversation_id=eq."+id},payload=>renderMessage(payload.new)).subscribe(s=>{$("convState").textContent=s==="SUBSCRIBED"?"متصل — استقبال فوري":"الاتصال: "+s;});
+ activeConversation=id;
+ knownMessages.clear();
+ $("convTitle").textContent=title;
+ $("convAvatar").textContent=(title.trim().charAt(0)||"N");
+ showEmpty("جارٍ تحميل الرسائل...");
+ $("app").classList.add("hidden");
+ $("conversation").classList.remove("hidden");
+
+ const {data,error}=await db.from("messages")
+  .select("id,sender_id,content,created_at")
+  .eq("conversation_id",id)
+  .is("deleted_at",null)
+  .order("created_at",{ascending:true})
+  .limit(300);
+
+ if(error){
+  showEmpty("تعذر تحميل الرسائل: "+error.message);
+  return;
+ }
+
+ $("messages").innerHTML="";
+ (data||[]).forEach(renderMessage);
+ if(!data||!data.length)showEmpty("لا توجد رسائل بعد. اكتب أول رسالة.");
+
+ if(messageChannel){
+  await db.removeChannel(messageChannel);
+  messageChannel=null;
+ }
+
+ messageChannel=db.channel("nexora-"+id)
+  .on("postgres_changes",
+   {event:"INSERT",schema:"public",table:"messages",filter:"conversation_id=eq."+id},
+   payload=>renderMessage(payload.new))
+  .subscribe(status=>{
+   $("convState").textContent=status==="SUBSCRIBED"?"متصل — استقبال فوري":"الاتصال: "+status;
+  });
 }
-$("convBack").addEventListener("click",async()=>{if(messageChannel){await db.removeChannel(messageChannel);messageChannel=null;}$("conversation").classList.add("hidden");$("app").classList.remove("hidden");});
+
+$("convBack").addEventListener("click",async()=>{
+ if(messageChannel){
+  await db.removeChannel(messageChannel);
+  messageChannel=null;
+ }
+ activeConversation=null;
+ $("conversation").classList.add("hidden");
+ $("app").classList.remove("hidden");
+});
+
 $("sendForm").addEventListener("submit",async e=>{
- e.preventDefault();const content=$("messageText").value.trim();if(!content||!activeConversation)return;
- const btn=e.submitter;btn.disabled=true;
- const {data,error}=await db.from("messages").insert({conversation_id:activeConversation,sender_id:currentUser.id,content,message_type:"text"}).select("id,sender_id,content,created_at").single();
- btn.disabled=false;if(error){alert("تعذر الإرسال: "+error.message);return;}
- $("messageText").value="";renderMessage(data);
+ e.preventDefault();
+ const input=$("messageText");
+ const content=input.value.trim();
+ if(!content||!activeConversation)return;
+
+ const btn=$("sendBtn");
+ btn.disabled=true;
+
+ const {data,error}=await db.from("messages")
+  .insert({conversation_id:activeConversation,sender_id:currentUser.id,content,message_type:"text"})
+  .select("id,sender_id,content,created_at")
+  .single();
+
+ btn.disabled=false;
+ if(error){
+  alert("تعذر الإرسال: "+error.message);
+  return;
+ }
+
+ input.value="";
+ renderMessage(data);
 });
-$("messageText").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("sendForm").requestSubmit();}});
-$("profileBtn").addEventListener("click",async()=>{
- const {data,error}=await db.from("profiles").select("id,username,display_name").eq("id",currentUser.id).single();
- if(error){alert(error.message);return;}activeProfile=data;
- $("profileDisplay").value=data.display_name||"";$("profileUsername").value=data.username||"";$("profileMessage").textContent="";
- $("profileModal").classList.remove("hidden");
-});
-$("profileClose").addEventListener("click",()=>$("profileModal").classList.add("hidden"));
-$("profileSave").addEventListener("click",async()=>{
- const display_name=$("profileDisplay").value.trim(),username=$("profileUsername").value.trim();
- if(!display_name||!username){$("profileMessage").textContent="أدخل الاسم واسم المستخدم.";return;}
- const {error}=await db.from("profiles").update({display_name,username}).eq("id",currentUser.id);
- if(error){$("profileMessage").textContent=error.message;return;}
- $("profileMessage").textContent="تم حفظ الملف الشخصي.";
+
+$("messageText").addEventListener("keydown",e=>{
+ if(e.key==="Enter"&&!e.shiftKey){
+  e.preventDefault();
+  $("sendForm").requestSubmit();
+ }
 });
 
 async function initialize(){
- try{
-  if(!window.supabase){
-   showMessage("تعذر تحميل مكتبة Supabase. تحقق من اتصال الإنترنت.");
-   return;
+ if(!window.supabase){
+  showMessage("تعذر تحميل مكتبة Supabase. تحقق من اتصال الإنترنت.");
+  return;
+ }
+
+ db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+ db.auth.onAuthStateChange((event)=>{
+  if(event==="SIGNED_OUT"){
+   currentUser=null;
+   $("app").classList.add("hidden");
+   $("conversation").classList.add("hidden");
+   $("auth").classList.remove("hidden");
   }
+ });
 
-  db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
+ try{
   const {data,error}=await db.auth.getSession();
   if(error)throw error;
-
-  if(data.session){
-   await enterApp(data.session.user);
-  }
- }catch(error){
-  showMessage("خطأ في تهيئة التطبيق: "+error.message);
+  if(data.session)await enterApp(data.session.user);
+ }catch(err){
+  showMessage("خطأ في تهيئة التطبيق: "+err.message);
  }
 }
 
-dbReady();
-function dbReady(){initialize();}
-
-db && db.auth.onAuthStateChange((event,session)=>{
- if(event==="SIGNED_OUT"){
-  currentUser=null;
-  $("app").classList.add("hidden");
-  $("auth").classList.remove("hidden");
- }
-});
+initialize();
 
 })();
 </script>
