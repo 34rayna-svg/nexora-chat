@@ -2,78 +2,94 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#080e20">
 <title>NEXORA</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#080e20;color:#f5f7ff;font-family:Arial,sans-serif}
-button,input,textarea{font:inherit}
-button{cursor:pointer}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e20;--panel:#0f1a31;--card:#14213b;--line:#ffffff14;--text:#f2f6ff;--muted:#8ea3c4;--accent:#2f7fe8;--accent2:#5b4cf0;--danger:#ff8ea3}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:Tahoma,Arial,sans-serif;font-size:15px}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
 .hidden{display:none!important}
-#auth{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(ellipse at top,#1b376b,#080e20 65%)}
-.authbox{width:100%;max-width:420px;background:#111d35;border:1px solid #ffffff20;border-radius:25px;padding:28px}
-.logo{width:65px;height:65px;border-radius:21px;background:linear-gradient(140deg,#38a5ff,#2452e9);display:grid;place-items:center;font-size:32px;font-weight:bold;margin:0 auto 15px}
-.brand{text-align:center;font-size:30px;letter-spacing:4px;margin:0}
-.tag{text-align:center;color:#91a9d2;font-size:12px;margin:8px 0 28px}
-h2{font-size:21px;margin:0}
+
+/* ---------- تسجيل الدخول ---------- */
+#auth{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(ellipse at top,#1b376b,var(--bg) 65%)}
+.authbox{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:28px}
+.logo{width:64px;height:64px;margin:0 auto 14px;border-radius:20px;background:linear-gradient(140deg,#38a5ff,#2452e9);display:grid;place-items:center;font-size:30px;font-weight:700}
+.brand{text-align:center;font-size:28px;letter-spacing:4px}
+.tag{text-align:center;color:var(--muted);font-size:12px;margin:6px 0 24px}
+h2{font-size:20px}
+.muted{color:var(--muted);font-size:13px;margin-top:6px}
 label{display:block;color:#b9c9e4;font-size:13px;margin:16px 0 8px}
-input,textarea{width:100%;padding:14px;border-radius:11px;border:1px solid #304466;background:#091329;color:white;outline:none}
+input,textarea{width:100%;padding:13px 14px;border-radius:12px;border:1px solid #304466;background:#091329;outline:none}
 input:focus,textarea:focus{border-color:#3898ff}
-.primary{border:0;border-radius:12px;padding:14px;background:linear-gradient(100deg,#238dff,#3159ef);color:white;font-weight:bold;width:100%;margin-top:20px}
+.primary{width:100%;margin-top:20px;padding:14px;border-radius:12px;background:linear-gradient(100deg,var(--accent),#3159ef);color:#fff;font-weight:700}
 .primary:disabled{opacity:.6}
-.switch{text-align:center;color:#91a9d2;font-size:13px;margin-top:20px}
-.switch span{color:#54aaff;cursor:pointer}
-#message{font-size:13px;text-align:center;line-height:1.7;color:#ffaaaa;margin-top:12px;overflow-wrap:anywhere}
-#app{min-height:100vh;max-width:650px;margin:auto;background:#0b1428;position:relative;padding-bottom:85px}
-.top{padding:22px 19px 17px;background:linear-gradient(130deg,#142c54,#0d1931);border-bottom:1px solid #ffffff12}
-.topline{display:flex;align-items:center;justify-content:space-between}
-.brandmini{font-size:24px;letter-spacing:3px;font-weight:bold}
+.linkbtn{display:block;margin:18px auto 0;color:#54aaff;font-size:14px}
+#message{text-align:center;font-size:13px;line-height:1.7;margin-top:12px;color:var(--danger);overflow-wrap:anywhere}
+
+/* ---------- الشاشة الرئيسية ---------- */
+#app{min-height:100vh;max-width:650px;margin:0 auto;padding-bottom:90px;background:var(--bg)}
+.top{padding:20px 18px 14px;background:linear-gradient(130deg,#142c54,#0d1931);border-bottom:1px solid var(--line)}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brandmini{font-size:22px;letter-spacing:3px;font-weight:700}
 .brandmini b{color:#48a6ff}
-.profilebtn,.newbtn{border:1px solid #ffffff20;background:#ffffff0c;color:#fff;border-radius:12px;padding:10px 13px}
-.subtitle{color:#8da6ce;font-size:12px;margin-top:7px}
-.search{margin-top:18px}
-.search input{background:#081329;border-color:#263b60;border-radius:13px}
-.stories{display:flex;gap:16px;overflow-x:auto;padding:17px 18px;border-bottom:1px solid #ffffff12}
-.story{text-align:center;min-width:61px;font-size:11px;color:#a9bad7}
-.circle{width:53px;height:53px;border-radius:50%;padding:3px;margin:0 auto 7px;background:linear-gradient(135deg,#35b6ff,#7556ff)}
-.circle span{height:100%;width:100%;display:grid;place-items:center;border-radius:50%;background:#142440;font-size:19px}
-.sectionhead{display:flex;align-items:center;justify-content:space-between;padding:20px 19px 10px}
+.subtitle{color:var(--muted);font-size:12px;margin-top:4px}
+.pill{padding:9px 13px;border-radius:12px;background:#ffffff10;border:1px solid #ffffff1f;font-size:14px}
+.search{margin-top:16px}
+.search input{background:#081329;border-color:#263b60;border-radius:14px;padding:12px 14px}
+
+.stories{display:flex;gap:14px;overflow-x:auto;padding:16px 18px;border-bottom:1px solid var(--line)}
+.story{text-align:center;min-width:60px;font-size:11px;color:#a9bad7}
+.circle{width:52px;height:52px;margin:0 auto 6px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#35b6ff,#7556ff)}
+.circle span{width:100%;height:100%;border-radius:50%;background:#142440;display:grid;place-items:center;font-size:18px}
+
+.sectionhead{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 10px}
 .sectionhead h2{font-size:17px}
-.muted{color:#8298bc;font-size:12px}
-#chatList{padding:0 13px}
-.chatrow{display:flex;align-items:center;gap:13px;padding:14px 8px;border-bottom:1px solid #ffffff0d;cursor:pointer}
-.avatar{width:49px;height:49px;flex-shrink:0;border-radius:17px;background:linear-gradient(140deg,#246fba,#343c9c);display:grid;place-items:center;font-size:19px;font-weight:bold}
+.btn-soft{padding:9px 13px;border-radius:12px;background:var(--card);border:1px solid #ffffff1f;font-size:14px}
+#status{font-size:12px;color:var(--muted);padding:0 18px 10px}
+
+#chatList{padding:0 10px}
+.chatrow{display:flex;align-items:center;gap:12px;padding:13px 8px;border-radius:14px;cursor:pointer;border-bottom:1px solid var(--line)}
+.chatrow:hover{background:#ffffff08}
+.avatar{width:48px;height:48px;flex-shrink:0;border-radius:16px;background:linear-gradient(140deg,#246fba,#343c9c);display:grid;place-items:center;font-size:18px;font-weight:700}
 .chatinfo{flex:1;min-width:0}
-.chatname{font-weight:bold;font-size:14px;margin-bottom:7px}
-.preview{font-size:12px;color:#8499ba;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.empty{text-align:center;color:#8da2c4;padding:45px 20px;font-size:13px;line-height:2}
-.bottom{position:fixed;bottom:0;left:0;right:0;max-width:650px;margin:auto;background:#101d35;border-top:1px solid #ffffff17;display:flex;justify-content:space-around;padding:11px 5px calc(11px + env(safe-area-inset-bottom));z-index:5}
-.navbtn{background:none;border:0;color:#8197bb;font-size:11px;display:grid;gap:5px;justify-items:center}
-.navbtn strong{font-size:20px}
+.chatname{font-weight:700;font-size:14px;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.preview{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{text-align:center;color:var(--muted);padding:40px 20px;line-height:1.9}
+
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:650px;display:flex;justify-content:space-around;padding:10px 6px calc(10px + env(safe-area-inset-bottom));background:var(--panel);border-top:1px solid var(--line);z-index:5}
+.navbtn{display:grid;gap:4px;justify-items:center;font-size:11px;color:#8197bb;padding:4px 10px;border-radius:12px}
+.navbtn strong{font-size:19px}
 .navbtn.active{color:#51aaff}
-#newPanel{position:fixed;inset:0;background:#0009;z-index:10;display:grid;place-items:center;padding:18px}
-.modal{width:100%;max-width:420px;background:#14213b;border:1px solid #ffffff22;border-radius:20px;padding:20px}
-.modalhead{display:flex;justify-content:space-between;align-items:center}
-.close{background:none;border:0;color:white;font-size:24px}
-.userresult{display:flex;align-items:center;gap:12px;padding:13px 5px;border-bottom:1px solid #ffffff12;cursor:pointer}
-#status{font-size:12px;color:#8fa7ca;padding:12px 19px}
-#conversation{position:fixed;inset:0;z-index:20;background:#080e20;display:flex;flex-direction:column;max-width:650px;margin:auto;width:100%;height:100dvh}
-.convhead{display:flex;align-items:center;gap:12px;padding:14px;background:#142746;border-bottom:1px solid #ffffff20}
-.convbody{flex:1;overflow:auto;padding:15px;display:flex;flex-direction:column;gap:9px}
-.msg{max-width:82%;padding:11px 14px;border-radius:16px;background:#1a2d4b;align-self:flex-start;white-space:pre-wrap;overflow-wrap:anywhere}
+
+/* ---------- النوافذ المنبثقة ---------- */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{width:100%;max-width:400px;max-height:85vh;overflow:auto;background:var(--card);border:1px solid #ffffff22;border-radius:20px;padding:20px}
+.modalhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.close{font-size:26px;line-height:1;padding:4px 8px;color:var(--muted)}
+.userresult{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.danger{width:100%;margin-top:12px;padding:12px;border-radius:12px;background:#3a1d28;border:1px solid #6b2d40;color:var(--danger)}
+
+/* ---------- شاشة المحادثة ---------- */
+#conversation{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;flex-direction:column;max-width:650px;margin:0 auto;height:100dvh}
+.convhead{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#142746;border-bottom:1px solid #ffffff20}
+.convhead .avatar{width:42px;height:42px;font-size:16px;border-radius:14px}
+.convbody{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:80%;padding:10px 13px;border-radius:16px;background:#1a2d4b;align-self:flex-start;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
 .msg.mine{align-self:flex-end;background:#176fca}
-.msg small{display:block;font-size:10px;opacity:.7;margin-top:5px}
-.convform{display:flex;gap:8px;padding:12px;background:#101d35}
-.convform textarea{flex:1;min-width:0;resize:none;border-radius:12px}
-.profilemodal{position:fixed;inset:0;background:#000a;z-index:30;display:grid;place-items:center;padding:18px}
-.profilecard{width:100%;max-width:420px;background:#14213b;border:1px solid #ffffff22;border-radius:20px;padding:20px}
-.danger{background:#3a1d28;border:1px solid #6b2d40;color:#ffb3c1;border-radius:12px;padding:12px;width:100%;margin-top:12px}
+.msg small{display:block;font-size:10px;opacity:.7;margin-top:4px}
+.convform{display:flex;gap:8px;align-items:flex-end;padding:10px 12px;background:var(--panel);border-top:1px solid var(--line)}
+.convform textarea{flex:1;min-width:0;resize:none;border-radius:14px;max-height:120px}
+.convform .primary{width:auto;margin:0;padding:12px 16px;border-radius:14px}
 </style>
 </head>
 <body>
 
+<!-- تسجيل الدخول -->
 <section id="auth">
  <div class="authbox">
   <div class="logo">N</div>
@@ -92,11 +108,12 @@ input:focus,textarea:focus{border-color:#3898ff}
    </div>
    <button class="primary" id="submitBtn" type="submit">تسجيل الدخول</button>
   </form>
-  <p class="switch"><span id="toggle" role="button" tabindex="0">إنشاء حساب جديد</span></p>
+  <button class="linkbtn" id="toggle" type="button">إنشاء حساب جديد</button>
   <div id="message" aria-live="polite"></div>
  </div>
 </section>
 
+<!-- الشاشة الرئيسية -->
 <main id="app" class="hidden">
  <header class="top">
   <div class="topline">
@@ -104,7 +121,7 @@ input:focus,textarea:focus{border-color:#3898ff}
     <div class="brandmini">NEX<b>ORA</b></div>
     <div class="subtitle">عالمك، محادثاتك، اتصالك</div>
    </div>
-   <button class="profilebtn" id="profileBtn">◉ حسابي</button>
+   <button class="pill" id="profileBtn">◉ حسابي</button>
   </div>
   <div class="search">
    <input id="filter" placeholder="ابحث في محادثاتك...">
@@ -119,7 +136,7 @@ input:focus,textarea:focus{border-color:#3898ff}
 
  <div class="sectionhead">
   <h2>المحادثات</h2>
-  <button class="newbtn" id="newChat">＋ محادثة جديدة</button>
+  <button class="btn-soft" id="newChat">＋ محادثة جديدة</button>
  </div>
  <div id="status">جارٍ تحميل المحادثات...</div>
  <section id="chatList"></section>
@@ -132,27 +149,29 @@ input:focus,textarea:focus{border-color:#3898ff}
  </nav>
 </main>
 
+<!-- شاشة المحادثة -->
 <section id="conversation" class="hidden">
  <header class="convhead">
-  <button class="newbtn" id="convBack">رجوع</button>
+  <button class="btn-soft" id="convBack">رجوع</button>
   <div class="avatar" id="convAvatar">N</div>
   <div style="flex:1;min-width:0">
-   <b id="convTitle">المحادثة</b>
-   <div class="muted" id="convState">تحميل...</div>
+   <div id="convTitle" style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">المحادثة</div>
+   <div class="muted" id="convState" style="margin-top:2px">تحميل...</div>
   </div>
  </header>
- <div id="messages" class="convbody"><div class="empty">جارٍ تحميل الرسائل...</div></div>
+ <div id="messages" class="convbody"></div>
  <form id="sendForm" class="convform">
   <textarea id="messageText" rows="1" maxlength="5000" placeholder="اكتب رسالتك..."></textarea>
-  <button class="newbtn" id="sendBtn" type="submit">إرسال</button>
+  <button class="primary" id="sendBtn" type="submit">إرسال</button>
  </form>
 </section>
 
-<section id="profileModal" class="profilemodal hidden">
- <div class="profilecard">
+<!-- الملف الشخصي -->
+<div id="profileModal" class="overlay hidden">
+ <div class="modal">
   <div class="modalhead">
    <h2>ملفي الشخصي</h2>
-   <button class="close" id="profileClose">×</button>
+   <button class="close" id="profileClose" aria-label="إغلاق">×</button>
   </div>
   <label for="profileDisplay">الاسم الظاهر</label>
   <input id="profileDisplay">
@@ -162,16 +181,17 @@ input:focus,textarea:focus{border-color:#3898ff}
   <button class="danger" id="logoutBtn">تسجيل الخروج</button>
   <div id="profileMessage" class="muted" style="margin-top:12px"></div>
  </div>
-</section>
+</div>
 
-<div id="newPanel" class="hidden">
+<!-- محادثة جديدة -->
+<div id="newPanel" class="overlay hidden">
  <div class="modal">
   <div class="modalhead">
    <h2>محادثة جديدة</h2>
-   <button class="close" id="closePanel">×</button>
+   <button class="close" id="closePanel" aria-label="إغلاق">×</button>
   </div>
   <p class="muted">ابحث عن مستخدم بالاسم أو اسم المستخدم.</p>
-  <input id="userSearch" placeholder="اكتب اسم المستخدم...">
+  <input id="userSearch" placeholder="اكتب اسم المستخدم..." style="margin-top:12px">
   <div id="userResults" style="margin-top:12px"></div>
  </div>
 </div>
@@ -182,24 +202,19 @@ input:focus,textarea:focus{border-color:#3898ff}
 
 const SUPABASE_URL="https://bhxqovclabgfxifaxwrf.supabase.co";
 const SUPABASE_KEY="sb_publishable_KELy2zTCIz73Os1eQDa8eQ_QWcCFNRJ";
-
 const $=id=>document.getElementById(id);
 
-let db=null;
-let signup=false;
-let currentUser=null;
-let allChats=[];
-let searchTimer=null;
-let activeConversation=null;
-let messageChannel=null;
-let knownMessages=new Set();
+let db=null, signup=false, currentUser=null, allChats=[];
+let searchTimer=null, activeConversation=null, messageChannel=null;
+const knownMessages=new Set();
 
-function showMessage(text,success=false){
+function showMessage(text,ok=false){
  const el=$("message");
  el.textContent=text;
- el.style.color=success?"#70e5b0":"#ffaaaa";
+ el.style.color=ok?"#70e5b0":"#ffaaaa";
 }
 
+/* ---------- تسجيل الدخول والتسجيل ---------- */
 function setMode(){
  signup=!signup;
  $("authTitle").textContent=signup?"إنشاء حساب جديد":"مرحباً بعودتك";
@@ -210,29 +225,16 @@ function setMode(){
  $("password").setAttribute("autocomplete",signup?"new-password":"current-password");
  showMessage("");
 }
-
 $("toggle").addEventListener("click",setMode);
-$("toggle").addEventListener("keydown",e=>{
- if(e.key==="Enter"||e.key===" "){e.preventDefault();setMode();}
-});
-
-async function enterApp(user){
- currentUser=user;
- $("auth").classList.add("hidden");
- $("conversation").classList.add("hidden");
- $("app").classList.remove("hidden");
- await loadChats();
-}
 
 $("authForm").addEventListener("submit",async e=>{
  e.preventDefault();
  const button=$("submitBtn");
  button.disabled=true;
- showMessage("جارٍ الاتصال...");
+ showMessage("جارٍ الاتصال...",true);
 
  try{
   if(!db)throw new Error("تعذر الاتصال بخدمة Supabase. تحقق من الإنترنت.");
-
   const email=$("email").value.trim();
   const password=$("password").value;
   let result;
@@ -240,16 +242,10 @@ $("authForm").addEventListener("submit",async e=>{
   if(signup){
    const displayName=$("displayName").value.trim();
    if(!displayName)throw new Error("أدخل الاسم الظاهر أولاً.");
-
-   result=await db.auth.signUp({
-    email,
-    password,
-    options:{data:{display_name:displayName}}
-   });
+   result=await db.auth.signUp({email,password,options:{data:{display_name:displayName}}});
    if(result.error)throw result.error;
-
    if(!result.data.session){
-    showMessage("تم إنشاء الحساب. افتح بريدك الإلكتروني وأكّد الحساب، ثم سجّل الدخول.",true);
+    showMessage("تم إنشاء الحساب. أكّد بريدك الإلكتروني ثم سجّل الدخول.",true);
     return;
    }
   }else{
@@ -268,6 +264,15 @@ $("authForm").addEventListener("submit",async e=>{
  }
 });
 
+async function enterApp(user){
+ currentUser=user;
+ $("auth").classList.add("hidden");
+ $("conversation").classList.add("hidden");
+ $("app").classList.remove("hidden");
+ await loadChats();
+}
+
+/* ---------- قائمة المحادثات ---------- */
 async function loadChats(){
  $("status").textContent="جارٍ تحميل المحادثات...";
 
@@ -281,48 +286,45 @@ async function loadChats(){
  }
 
  const convs=(data||[]).map(r=>r.conversations).filter(Boolean);
- const names={};
+ const nameByConv={};
 
  if(convs.length){
-  const ids=convs.map(c=>c.id);
   const {data:others}=await db.from("conversation_members")
    .select("conversation_id,user_id")
-   .in("conversation_id",ids)
+   .in("conversation_id",convs.map(c=>c.id))
    .neq("user_id",currentUser.id);
 
   const otherIds=[...new Set((others||[]).map(m=>m.user_id))];
-  let profiles=[];
+  const profileById={};
   if(otherIds.length){
-   const {data:p}=await db.from("profiles").select("id,display_name,username").in("id",otherIds);
-   profiles=p||[];
+   const {data:profiles}=await db.from("profiles")
+    .select("id,display_name,username")
+    .in("id",otherIds);
+   (profiles||[]).forEach(p=>profileById[p.id]=p);
   }
-  const byId={};
-  profiles.forEach(p=>byId[p.id]=p);
   (others||[]).forEach(m=>{
-   if(!names[m.conversation_id]){
-    const p=byId[m.user_id];
-    names[m.conversation_id]=p?(p.display_name||p.username):null;
-   }
+   if(nameByConv[m.conversation_id])return;
+   const p=profileById[m.user_id];
+   if(p)nameByConv[m.conversation_id]=p.display_name||p.username;
   });
  }
 
  allChats=convs.map(c=>({
   ...c,
-  displayTitle:c.is_group?(c.title||"مجموعة"):(names[c.id]||"محادثة خاصة")
+  title:c.is_group?(c.title||"مجموعة"):(nameByConv[c.id]||"محادثة خاصة")
  }));
-
  applyFilter();
 }
 
 function applyFilter(){
  const q=$("filter").value.trim().toLowerCase();
- renderChats(allChats.filter(c=>c.displayTitle.toLowerCase().includes(q)));
+ renderChats(allChats.filter(c=>c.title.toLowerCase().includes(q)));
 }
 
 function renderChats(chats){
  const list=$("chatList");
  list.innerHTML="";
- $("status").textContent=allChats.length?allChats.length+" محادثة":"لا توجد محادثات حتى الآن";
+ $("status").textContent=allChats.length?allChats.length+" محادثة":"";
 
  if(!chats.length){
   list.innerHTML='<div class="empty">ليس لديك محادثات بعد.<br>ابدأ محادثة جديدة مع أحد مستخدمي NEXORA.</div>';
@@ -335,14 +337,14 @@ function renderChats(chats){
 
   const avatar=document.createElement("div");
   avatar.className="avatar";
-  avatar.textContent=chat.is_group?"👥":(chat.displayTitle.trim().charAt(0)||"N");
+  avatar.textContent=chat.is_group?"👥":(chat.title.charAt(0)||"N");
 
   const info=document.createElement("div");
   info.className="chatinfo";
 
   const name=document.createElement("div");
   name.className="chatname";
-  name.textContent=chat.displayTitle;
+  name.textContent=chat.title;
 
   const preview=document.createElement("div");
   preview.className="preview";
@@ -350,19 +352,19 @@ function renderChats(chats){
 
   info.append(name,preview);
   row.append(avatar,info);
-  row.addEventListener("click",()=>openConversation(chat.id,chat.displayTitle));
+  row.addEventListener("click",()=>openConversation(chat.id,chat.title));
   list.append(row);
  });
 }
 
 $("filter").addEventListener("input",applyFilter);
 
+/* ---------- محادثة جديدة ---------- */
 $("newChat").addEventListener("click",()=>{
  $("newPanel").classList.remove("hidden");
  $("userSearch").value="";
  $("userResults").textContent="";
 });
-
 $("closePanel").addEventListener("click",()=>$("newPanel").classList.add("hidden"));
 
 $("userSearch").addEventListener("input",()=>{
@@ -373,15 +375,13 @@ $("userSearch").addEventListener("input",()=>{
 async function searchUsers(){
  const query=$("userSearch").value.trim();
  const results=$("userResults");
-
  if(query.length<2){
   results.textContent="اكتب حرفين على الأقل للبحث.";
   return;
  }
-
  results.textContent="جارٍ البحث...";
- const safe=query.replace(/[*,()"]/g,"");
 
+ const safe=query.replace(/[*,()"]/g,"");
  const {data,error}=await db.from("profiles")
   .select("id,username,display_name")
   .neq("id",currentUser.id)
@@ -392,9 +392,7 @@ async function searchUsers(){
   results.textContent="تعذر البحث: "+error.message;
   return;
  }
-
  results.innerHTML="";
-
  if(!data||!data.length){
   results.textContent="لم يتم العثور على مستخدمين.";
   return;
@@ -406,13 +404,15 @@ async function searchUsers(){
 
   const avatar=document.createElement("div");
   avatar.className="avatar";
+  avatar.style.width="42px";
+  avatar.style.height="42px";
   avatar.textContent=(user.display_name||user.username||"N").charAt(0);
 
   const info=document.createElement("div");
+  info.style.minWidth="0";
   const name=document.createElement("div");
   name.className="chatname";
   name.textContent=user.display_name||"مستخدم NEXORA";
-
   const handle=document.createElement("div");
   handle.className="preview";
   handle.textContent=user.username?"@"+user.username:"";
@@ -426,31 +426,26 @@ async function searchUsers(){
 
 async function startChat(user){
  $("userResults").textContent="جارٍ إنشاء المحادثة...";
-
  const {data:convId,error}=await db.rpc("create_direct_conversation",{p_other_user_id:user.id});
-
  if(error){
   $("userResults").textContent="تعذر إنشاء المحادثة: "+error.message;
   return;
  }
-
  $("newPanel").classList.add("hidden");
  await loadChats();
  openConversation(convId,user.display_name||user.username||"مستخدم NEXORA");
 }
 
-function openProfile(){
- db.from("profiles").select("id,username,display_name").eq("id",currentUser.id).single()
-  .then(({data,error})=>{
-   if(error){alert(error.message);return;}
-   $("profileDisplay").value=data.display_name||"";
-   $("profileUsername").value=data.username||"";
-   $("profileMessage").textContent="";
-   $("profileModal").classList.remove("hidden");
-  });
-}
-
-$("profileBtn").addEventListener("click",openProfile);
+/* ---------- الملف الشخصي ---------- */
+$("profileBtn").addEventListener("click",async()=>{
+ const {data,error}=await db.from("profiles")
+  .select("id,username,display_name").eq("id",currentUser.id).single();
+ if(error){alert(error.message);return;}
+ $("profileDisplay").value=data.display_name||"";
+ $("profileUsername").value=data.username||"";
+ $("profileMessage").textContent="";
+ $("profileModal").classList.remove("hidden");
+});
 $("profileClose").addEventListener("click",()=>$("profileModal").classList.add("hidden"));
 
 $("profileSave").addEventListener("click",async()=>{
@@ -475,12 +470,14 @@ $("storiesBtn").addEventListener("click",()=>alert("قسم الحالات قيد
 $("callsBtn").addEventListener("click",()=>alert("المكالمات تحتاج إعداد خدمة اتصال مستقلة."));
 $("settingsBtn").addEventListener("click",()=>alert("إعدادات الحساب قيد التطوير."));
 
+/* ---------- الرسائل ---------- */
 function renderMessage(m){
  if(knownMessages.has(m.id))return;
  knownMessages.add(m.id);
 
  const box=$("messages");
- if(box.querySelector(".empty"))box.innerHTML="";
+ const placeholder=box.querySelector(".empty");
+ if(placeholder)box.innerHTML="";
 
  const el=document.createElement("div");
  el.className="msg"+(m.sender_id===currentUser.id?" mine":"");
@@ -507,7 +504,7 @@ async function openConversation(id,title){
  activeConversation=id;
  knownMessages.clear();
  $("convTitle").textContent=title;
- $("convAvatar").textContent=(title.trim().charAt(0)||"N");
+ $("convAvatar").textContent=title.charAt(0)||"N";
  showEmpty("جارٍ تحميل الرسائل...");
  $("app").classList.add("hidden");
  $("conversation").classList.remove("hidden");
@@ -532,7 +529,6 @@ async function openConversation(id,title){
   await db.removeChannel(messageChannel);
   messageChannel=null;
  }
-
  messageChannel=db.channel("nexora-"+id)
   .on("postgres_changes",
    {event:"INSERT",schema:"public",table:"messages",filter:"conversation_id=eq."+id},
@@ -560,18 +556,16 @@ $("sendForm").addEventListener("submit",async e=>{
 
  const btn=$("sendBtn");
  btn.disabled=true;
-
  const {data,error}=await db.from("messages")
   .insert({conversation_id:activeConversation,sender_id:currentUser.id,content,message_type:"text"})
   .select("id,sender_id,content,created_at")
   .single();
-
  btn.disabled=false;
+
  if(error){
   alert("تعذر الإرسال: "+error.message);
   return;
  }
-
  input.value="";
  renderMessage(data);
 });
@@ -583,15 +577,15 @@ $("messageText").addEventListener("keydown",e=>{
  }
 });
 
+/* ---------- التهيئة ---------- */
 async function initialize(){
  if(!window.supabase){
   showMessage("تعذر تحميل مكتبة Supabase. تحقق من اتصال الإنترنت.");
   return;
  }
-
  db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
- db.auth.onAuthStateChange((event)=>{
+ db.auth.onAuthStateChange(event=>{
   if(event==="SIGNED_OUT"){
    currentUser=null;
    $("app").classList.add("hidden");
@@ -610,7 +604,6 @@ async function initialize(){
 }
 
 initialize();
-
 })();
 </script>
 </body>
