@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -23,10 +22,11 @@ label{display:block;color:#b9c9e4;font-size:13px;margin:16px 0 8px}
 input{width:100%;padding:14px;border-radius:11px;border:1px solid #304466;background:#091329;color:white;outline:none}
 input:focus{border-color:#3898ff}
 .primary{border:0;border-radius:12px;padding:14px;background:linear-gradient(100deg,#238dff,#3159ef);color:white;font-weight:bold;width:100%;margin-top:20px}
+.primary:disabled{opacity:.6}
 .switch{text-align:center;color:#91a9d2;font-size:13px;margin-top:20px}
 .switch span{color:#54aaff;cursor:pointer}
-#message{font-size:13px;text-align:center;color:#ffaaaa;margin-top:12px}
-#app{min-height:100vh;max-width:650px;margin:auto;background:#0b1428;position:relative;padding-bottom:78px}
+#message{font-size:13px;text-align:center;line-height:1.7;color:#ffaaaa;margin-top:12px;overflow-wrap:anywhere}
+#app{min-height:100vh;max-width:650px;margin:auto;background:#0b1428;position:relative;padding-bottom:85px}
 .top{padding:22px 19px 17px;background:linear-gradient(130deg,#142c54,#0d1931);border-bottom:1px solid #ffffff12}
 .topline{display:flex;align-items:center;justify-content:space-between}
 .brandmini{font-size:24px;letter-spacing:3px;font-weight:bold}
@@ -72,18 +72,18 @@ input:focus{border-color:#3898ff}
    <h2 id="authTitle">مرحباً بعودتك</h2>
    <p class="muted" id="authDesc">سجّل الدخول وتواصل مع العالم.</p>
    <form id="authForm">
-    <label>البريد الإلكتروني</label>
-    <input id="email" type="email" required placeholder="example@email.com">
-    <label>كلمة المرور</label>
-    <input id="password" type="password" required minlength="6" placeholder="••••••••">
+    <label for="email">البريد الإلكتروني</label>
+    <input id="email" type="email" required placeholder="example@email.com" autocomplete="email">
+    <label for="password">كلمة المرور</label>
+    <input id="password" type="password" required minlength="6" placeholder="••••••••" autocomplete="current-password">
     <div id="nameArea" class="hidden">
-     <label>الاسم الظاهر</label>
-     <input id="displayName" placeholder="اسمك">
+     <label for="displayName">الاسم الظاهر</label>
+     <input id="displayName" placeholder="اسمك" autocomplete="name">
     </div>
-    <button class="primary" id="submitBtn">تسجيل الدخول</button>
+    <button class="primary" id="submitBtn" type="submit">تسجيل الدخول</button>
    </form>
-   <p class="switch"><span id="toggle">إنشاء حساب جديد</span></p>
-   <div id="message"></div>
+   <p class="switch"><span id="toggle" role="button" tabindex="0">إنشاء حساب جديد</span></p>
+   <div id="message" aria-live="polite"></div>
   </div>
  </div>
 </section>
@@ -109,7 +109,7 @@ input:focus{border-color:#3898ff}
  </section>
 
  <div class="sectionhead">
-  <h2 id="listTitle">المحادثات</h2>
+  <h2>المحادثات</h2>
   <button class="newbtn" id="newChat">＋ محادثة جديدة</button>
  </div>
  <div id="status">جارٍ تحميل المحادثات...</div>
@@ -136,39 +136,39 @@ input:focus{border-color:#3898ff}
 </div>
 
 <script>
-const URL="https://bhxqovclabgfxifaxwrf.supabase.co";
-const KEY="sb_publishable_KELy2zTCIz73Os1eQDa8eQ_QWcCFNRJ";
-const db=window.supabase.createClient(URL,KEY);
-const $=id=>document.getElementById(id);
-let signup=false,currentUser=null,allChats=[];
+(function(){
+"use strict";
 
-function msg(t){$("message").textContent=t}
-$("toggle").onclick=()=>{
+const SUPABASE_URL="https://bhxqovclabgfxifaxwrf.supabase.co";
+const SUPABASE_KEY="sb_publishable_KELy2zTCIz73Os1eQDa8eQ_QWcCFNRJ";
+const $=id=>document.getElementById(id);
+
+let db=null;
+let signup=false;
+let currentUser=null;
+let allChats=[];
+let searchTimer=null;
+
+function showMessage(message,success=false){
+ $("message").textContent=message;
+ $("message").style.color=success?"#70e5b0":"#ffaaaa";
+}
+
+function setMode(){
  signup=!signup;
  $("authTitle").textContent=signup?"إنشاء حساب جديد":"مرحباً بعودتك";
  $("authDesc").textContent=signup?"أنشئ حسابك في NEXORA.":"سجّل الدخول وتواصل مع العالم.";
  $("submitBtn").textContent=signup?"إنشاء الحساب":"تسجيل الدخول";
  $("toggle").textContent=signup?"لديك حساب؟ تسجيل الدخول":"إنشاء حساب جديد";
  $("nameArea").classList.toggle("hidden",!signup);
- msg("");
-};
+ $("password").autocomplete=signup?"new-password":"current-password";
+ showMessage("");
+}
 
-$("authForm").onsubmit=async e=>{
- e.preventDefault();
- $("submitBtn").disabled=true;
- msg("يرجى الانتظار...");
- try{
-  const email=$("email").value.trim();
-  const password=$("password").value;
-  const result=signup
-   ?await db.auth.signUp({email,password,options:{data:{display_name:$("displayName").value.trim()}}})
-   :await db.auth.signInWithPassword({email,password});
-  if(result.error)throw result.error;
-  if(signup&&!result.data.session){msg("تم إنشاء الحساب. تحقق من بريدك الإلكتروني.");return;}
-  if(result.data.session)await enterApp(result.data.session.user);
- }catch(err){msg(err.message||"حدث خطأ.");}
- finally{$("submitBtn").disabled=false;}
-};
+$("toggle").addEventListener("click",setMode);
+$("toggle").addEventListener("keydown",e=>{
+ if(e.key==="Enter"||e.key===" "){e.preventDefault();setMode();}
+});
 
 async function enterApp(user){
  currentUser=user;
@@ -177,109 +177,252 @@ async function enterApp(user){
  await loadChats();
 }
 
+$("authForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const button=$("submitBtn");
+ button.disabled=true;
+ button.textContent="يرجى الانتظار...";
+ showMessage("جارٍ الاتصال...");
+
+ try{
+  if(!db)throw new Error("تعذر الاتصال بخدمة Supabase. تحقق من الإنترنت.");
+
+  const email=$("email").value.trim();
+  const password=$("password").value;
+  let result;
+
+  if(signup){
+   const displayName=$("displayName").value.trim();
+   if(!displayName)throw new Error("أدخل الاسم الظاهر أولاً.");
+
+   result=await db.auth.signUp({
+    email:email,
+    password:password,
+    options:{data:{display_name:displayName}}
+   });
+
+   if(result.error)throw result.error;
+
+   if(!result.data.session){
+    showMessage("تم إنشاء الحساب. افتح بريدك الإلكتروني وأكّد الحساب، ثم سجّل الدخول.",true);
+    return;
+   }
+  }else{
+   result=await db.auth.signInWithPassword({
+    email:email,
+    password:password
+   });
+   if(result.error)throw result.error;
+  }
+
+  if(result.data.session){
+   showMessage("تم تسجيل الدخول بنجاح.",true);
+   await enterApp(result.data.session.user);
+  }else{
+   showMessage("لم يتم إنشاء جلسة دخول. تحقق من بريدك الإلكتروني.");
+  }
+
+ }catch(err){
+  showMessage(err.message||"حدث خطأ غير معروف.");
+ }finally{
+  button.disabled=false;
+  button.textContent=signup?"إنشاء الحساب":"تسجيل الدخول";
+ }
+});
+
 async function loadChats(){
  $("status").textContent="جارٍ تحميل المحادثات...";
  const {data,error}=await db.from("conversation_members")
   .select("conversation_id,conversations(id,is_group,title,created_at)")
   .eq("user_id",currentUser.id);
- if(error){$("status").textContent="تعذر تحميل المحادثات: "+error.message;return;}
- allChats=(data||[]).map(x=>x.conversations).filter(Boolean);
+
+ if(error){
+  $("status").textContent="تعذر تحميل المحادثات: "+error.message;
+  return;
+ }
+
+ allChats=(data||[]).map(item=>item.conversations).filter(Boolean);
  renderChats(allChats);
 }
 
 function renderChats(chats){
  $("chatList").innerHTML="";
  $("status").textContent=chats.length?chats.length+" محادثة":"لا توجد محادثات حتى الآن";
+
  if(!chats.length){
   $("chatList").innerHTML='<div class="empty">ليس لديك محادثات بعد.<br>ابدأ محادثة جديدة مع أحد مستخدمي NEXORA.</div>';
   return;
  }
- chats.forEach(c=>{
-  const el=document.createElement("div");
-  el.className="chatrow";
-  const avatar=document.createElement("div");avatar.className="avatar";avatar.textContent=c.is_group?"👥":"N";
-  const info=document.createElement("div");info.className="chatinfo";
-  const name=document.createElement("div");name.className="chatname";name.textContent=c.title||"محادثة خاصة";
-  const preview=document.createElement("div");preview.className="preview";preview.textContent="افتح المحادثة";
-  info.append(name,preview);el.append(avatar,info);
-  el.onclick=()=>alert("سنضيف شاشة الرسائل في الخطوة التالية.");
-  $("chatList").append(el);
+
+ chats.forEach(chat=>{
+  const row=document.createElement("div");
+  row.className="chatrow";
+
+  const avatar=document.createElement("div");
+  avatar.className="avatar";
+  avatar.textContent=chat.is_group?"👥":"N";
+
+  const info=document.createElement("div");
+  info.className="chatinfo";
+
+  const name=document.createElement("div");
+  name.className="chatname";
+  name.textContent=chat.title||"محادثة خاصة";
+
+  const preview=document.createElement("div");
+  preview.className="preview";
+  preview.textContent="افتح المحادثة";
+
+  info.append(name,preview);
+  row.append(avatar,info);
+
+  row.addEventListener("click",()=>{
+   alert("واجهة الرسائل سنضيفها في المرحلة التالية.");
+  });
+
+  $("chatList").append(row);
  });
 }
 
-$("filter").oninput=()=>{
+$("filter").addEventListener("input",()=>{
  const q=$("filter").value.trim().toLowerCase();
- renderChats(allChats.filter(c=>(c.title||"محادثة خاصة").toLowerCase().includes(q)));
-};
+ renderChats(allChats.filter(chat=>
+  (chat.title||"محادثة خاصة").toLowerCase().includes(q)
+ ));
+});
 
-$("newChat").onclick=()=>{
+$("newChat").addEventListener("click",()=>{
  $("newPanel").classList.remove("hidden");
  $("userSearch").value="";
- $("userResults").innerHTML="";
-};
-$("closePanel").onclick=()=>$("newPanel").classList.add("hidden");
+ $("userResults").textContent="";
+});
 
-let searchTimer;
-$("userSearch").oninput=()=>{
+$("closePanel").addEventListener("click",()=>{
+ $("newPanel").classList.add("hidden");
+});
+
+$("userSearch").addEventListener("input",()=>{
  clearTimeout(searchTimer);
- searchTimer=setTimeout(searchUsers,350);
-};
+ searchTimer=setTimeout(searchUsers,400);
+});
 
 async function searchUsers(){
- const q=$("userSearch").value.trim();
- if(q.length<2){$("userResults").innerHTML="";return;}
+ const query=$("userSearch").value.trim();
+ if(query.length<2){
+  $("userResults").textContent="اكتب حرفين على الأقل للبحث.";
+  return;
+ }
+
+ $("userResults").textContent="جارٍ البحث...";
+
+ const safeQuery=query.replace(/[%_]/g,"");
  const {data,error}=await db.from("profiles")
   .select("id,username,display_name")
   .neq("id",currentUser.id)
-  .or("username.ilike.%"+q+"%,display_name.ilike.%"+q+"%")
+  .or("username.ilike.%"+safeQuery+"%,display_name.ilike.%"+safeQuery+"%")
   .limit(15);
- if(error){$("userResults").textContent="تعذر البحث: "+error.message;return;}
+
+ if(error){
+  $("userResults").textContent="تعذر البحث: "+error.message;
+  return;
+ }
+
  $("userResults").innerHTML="";
- if(!data.length){$("userResults").textContent="لم يتم العثور على مستخدمين.";return;}
- data.forEach(u=>{
-  const row=document.createElement("div");row.className="userresult";
-  const av=document.createElement("div");av.className="avatar";av.textContent=(u.display_name||u.username||"N").slice(0,1);
+
+ if(!data||!data.length){
+  $("userResults").textContent="لم يتم العثور على مستخدمين.";
+  return;
+ }
+
+ data.forEach(user=>{
+  const row=document.createElement("div");
+  row.className="userresult";
+
+  const avatar=document.createElement("div");
+  avatar.className="avatar";
+  avatar.textContent=(user.display_name||user.username||"N").slice(0,1);
+
   const info=document.createElement("div");
-  const name=document.createElement("div");name.className="chatname";name.textContent=u.display_name||"مستخدم NEXORA";
-  const handle=document.createElement("div");handle.className="preview";handle.textContent=u.username?"@"+u.username:"";
-  info.append(name,handle);row.append(av,info);
-  row.onclick=()=>startChat(u);
+  const name=document.createElement("div");
+  name.className="chatname";
+  name.textContent=user.display_name||"مستخدم NEXORA";
+
+  const handle=document.createElement("div");
+  handle.className="preview";
+  handle.textContent=user.username?"@"+user.username:"";
+
+  info.append(name,handle);
+  row.append(avatar,info);
+  row.addEventListener("click",()=>startChat(user));
   $("userResults").append(row);
  });
 }
 
 async function startChat(user){
  $("userResults").textContent="جارٍ إنشاء المحادثة...";
- const {data,error}=await db.rpc("create_direct_conversation",{p_other_user_id:user.id});
- if(error){$("userResults").textContent="تعذر إنشاء المحادثة: "+error.message;return;}
+
+ const {data,error}=await db.rpc("create_direct_conversation",{
+  p_other_user_id:user.id
+ });
+
+ if(error){
+  $("userResults").textContent="تعذر إنشاء المحادثة: "+error.message;
+  return;
+ }
+
  $("newPanel").classList.add("hidden");
  await loadChats();
  alert("تم إنشاء المحادثة أو فتح محادثتك السابقة.");
 }
 
-$("profileBtn").onclick=async()=>{
- const choice=confirm("هل تريد تسجيل الخروج؟");
- if(!choice)return;
+$("profileBtn").addEventListener("click",async()=>{
+ if(!confirm("هل تريد تسجيل الخروج؟"))return;
  const {error}=await db.auth.signOut();
  if(error){alert(error.message);return;}
- currentUser=null;
- $("app").classList.add("hidden");
- $("auth").classList.remove("hidden");
-};
-$("storiesBtn").onclick=()=>alert("سنضيف الحالات في المرحلة التالية.");
-$("callsBtn").onclick=()=>alert("المكالمات تحتاج إعداد خدمة اتصال منفصلة.");
-$("settingsBtn").onclick=()=>alert("سنضيف إعدادات الحساب في المرحلة التالية.");
-
-db.auth.getSession().then(({data})=>{
- if(data.session)enterApp(data.session.user);
 });
-db.auth.onAuthStateChange((event,session)=>{
+
+$("storiesBtn").addEventListener("click",()=>{
+ alert("قسم الحالات قيد التطوير.");
+});
+$("callsBtn").addEventListener("click",()=>{
+ alert("المكالمات تحتاج إعداد خدمة اتصال مستقلة.");
+});
+$("settingsBtn").addEventListener("click",()=>{
+ alert("إعدادات الحساب قيد التطوير.");
+});
+
+async function initialize(){
+ try{
+  if(!window.supabase){
+   showMessage("تعذر تحميل مكتبة Supabase. تحقق من اتصال الإنترنت.");
+   return;
+  }
+
+  db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+  const {data,error}=await db.auth.getSession();
+  if(error)throw error;
+
+  if(data.session){
+   await enterApp(data.session.user);
+  }
+ }catch(error){
+  showMessage("خطأ في تهيئة التطبيق: "+error.message);
+ }
+}
+
+dbReady();
+function dbReady(){initialize();}
+
+db && db.auth.onAuthStateChange((event,session)=>{
  if(event==="SIGNED_OUT"){
   currentUser=null;
   $("app").classList.add("hidden");
   $("auth").classList.remove("hidden");
  }
 });
+
+})();
 </script>
 </body>
 </html>
