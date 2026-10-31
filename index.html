@@ -59,6 +59,17 @@ input:focus{border-color:#3898ff}
 .close{background:none;border:0;color:white;font-size:24px}
 .userresult{display:flex;align-items:center;gap:12px;padding:13px 5px;border-bottom:1px solid #ffffff12;cursor:pointer}
 #status{font-size:12px;color:#8fa7ca;padding:12px 19px}
+
+#conversation{position:fixed;inset:0;z-index:20;background:#080e20;display:flex;flex-direction:column;max-width:650px;margin:auto;width:100%;height:100dvh}
+.convhead{display:flex;align-items:center;gap:12px;padding:14px;background:#142746;border-bottom:1px solid #ffffff20}
+.convbody{flex:1;overflow:auto;padding:15px;display:flex;flex-direction:column;gap:9px}
+.msg{max-width:82%;padding:11px 14px;border-radius:16px;background:#1a2d4b;align-self:flex-start;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.mine{align-self:flex-end;background:#176fca}
+.msg small{display:block;font-size:10px;opacity:.7;margin-top:5px}
+.convform{display:flex;gap:8px;padding:12px;background:#101d35}
+.convform textarea{flex:1;min-width:0;resize:none;border-radius:12px;border:1px solid #304466;background:#091329;color:white;padding:12px;font:inherit}
+.profilemodal{position:fixed;inset:0;background:#000a;z-index:30;display:grid;place-items:center;padding:18px}
+.profilecard{width:100%;max-width:420px;background:#14213b;border:1px solid #ffffff22;border-radius:20px;padding:20px}
 </style>
 </head>
 <body>
@@ -123,6 +134,13 @@ input:focus{border-color:#3898ff}
  </nav>
 </main>
 
+
+<section id="conversation" class="hidden">
+ <header class="convhead"><button class="newbtn" id="convBack">رجوع</button><div class="avatar">N</div><div style="flex:1"><b id="convTitle">المحادثة</b><div class="muted" id="convState">تحميل...</div></div></header>
+ <div id="messages" class="convbody"><div class="empty">جارٍ تحميل الرسائل...</div></div>
+ <form id="sendForm" class="convform"><textarea id="messageText" rows="1" maxlength="5000" placeholder="اكتب رسالتك..."></textarea><button class="newbtn" type="submit">إرسال</button></form>
+</section>
+<section id="profileModal" class="profilemodal hidden"><div class="profilecard"><div class="modalhead"><h2>ملفي الشخصي</h2><button class="close" id="profileClose">×</button></div><label>الاسم الظاهر</label><input id="profileDisplay"><label>اسم المستخدم</label><input id="profileUsername"><button class="primary" id="profileSave">حفظ التغييرات</button><div id="profileMessage" class="muted"></div></div></section>
 <div id="newPanel" class="hidden">
  <div class="modal">
   <div class="modalhead">
@@ -276,9 +294,7 @@ function renderChats(chats){
   info.append(name,preview);
   row.append(avatar,info);
 
-  row.addEventListener("click",()=>{
-   alert("واجهة الرسائل سنضيفها في المرحلة التالية.");
-  });
+  row.addEventListener("click",()=>openConversation(chat.id,chat.title||"محادثة خاصة"));
 
   $("chatList").append(row);
  });
@@ -389,6 +405,52 @@ $("callsBtn").addEventListener("click",()=>{
 });
 $("settingsBtn").addEventListener("click",()=>{
  alert("إعدادات الحساب قيد التطوير.");
+});
+
+
+let activeConversation=null, messageChannel=null, knownMessages=new Set(), activeProfile=null;
+function safeText(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function renderMessage(m){
+ if(knownMessages.has(m.id))return;knownMessages.add(m.id);
+ const box=$("messages");if(box.querySelector(".empty"))box.innerHTML="";
+ const el=document.createElement("div");el.className="msg"+(m.sender_id===currentUser.id?" mine":"");
+ el.textContent=m.content||"";
+ const stamp=document.createElement("small");stamp.textContent=new Date(m.created_at).toLocaleString("ar-DZ",{hour:"2-digit",minute:"2-digit"});
+ el.appendChild(stamp);box.appendChild(el);box.scrollTop=box.scrollHeight;
+}
+async function openConversation(id,title){
+ activeConversation=id;knownMessages.clear();
+ $("convTitle").textContent=title;$("messages").innerHTML='<div class="empty">جارٍ تحميل الرسائل...</div>';
+ $("app").classList.add("hidden");$("conversation").classList.remove("hidden");
+ const {data,error}=await db.from("messages").select("id,sender_id,content,created_at,deleted_at").eq("conversation_id",id).is("deleted_at",null).order("created_at",{ascending:true}).limit(300);
+ if(error){$("messages").innerHTML='<div class="empty">'+safeText(error.message)+'</div>';return;}
+ $("messages").innerHTML="";(data||[]).forEach(renderMessage);
+ if(!data?.length)$("messages").innerHTML='<div class="empty">لا توجد رسائل بعد. اكتب أول رسالة.</div>';
+ if(messageChannel)await db.removeChannel(messageChannel);
+ messageChannel=db.channel("nexora-"+id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"conversation_id=eq."+id},payload=>renderMessage(payload.new)).subscribe(s=>{$("convState").textContent=s==="SUBSCRIBED"?"متصل — استقبال فوري":"الاتصال: "+s;});
+}
+$("convBack").addEventListener("click",async()=>{if(messageChannel){await db.removeChannel(messageChannel);messageChannel=null;}$("conversation").classList.add("hidden");$("app").classList.remove("hidden");});
+$("sendForm").addEventListener("submit",async e=>{
+ e.preventDefault();const content=$("messageText").value.trim();if(!content||!activeConversation)return;
+ const btn=e.submitter;btn.disabled=true;
+ const {data,error}=await db.from("messages").insert({conversation_id:activeConversation,sender_id:currentUser.id,content,message_type:"text"}).select("id,sender_id,content,created_at").single();
+ btn.disabled=false;if(error){alert("تعذر الإرسال: "+error.message);return;}
+ $("messageText").value="";renderMessage(data);
+});
+$("messageText").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("sendForm").requestSubmit();}});
+$("profileBtn").addEventListener("click",async()=>{
+ const {data,error}=await db.from("profiles").select("id,username,display_name").eq("id",currentUser.id).single();
+ if(error){alert(error.message);return;}activeProfile=data;
+ $("profileDisplay").value=data.display_name||"";$("profileUsername").value=data.username||"";$("profileMessage").textContent="";
+ $("profileModal").classList.remove("hidden");
+});
+$("profileClose").addEventListener("click",()=>$("profileModal").classList.add("hidden"));
+$("profileSave").addEventListener("click",async()=>{
+ const display_name=$("profileDisplay").value.trim(),username=$("profileUsername").value.trim();
+ if(!display_name||!username){$("profileMessage").textContent="أدخل الاسم واسم المستخدم.";return;}
+ const {error}=await db.from("profiles").update({display_name,username}).eq("id",currentUser.id);
+ if(error){$("profileMessage").textContent=error.message;return;}
+ $("profileMessage").textContent="تم حفظ الملف الشخصي.";
 });
 
 async function initialize(){
